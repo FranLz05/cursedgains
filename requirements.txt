@@ -1,0 +1,8 @@
+# Python de PumpParadox (voz, mezcla de audio, auditorias, hojas de contactos). Probado con Python 3.14.
+edge-tts>=7.3        # locucion (en-US-ChristopherNeural); necesita internet
+numpy>=2.0
+scipy>=1.13          # filtros / mezcla de audio
+opencv-python-headless>=4.9   # camara_audit.py (RANSAC / Lucas-Kanade)
+Pillow>=10           # herramientas/hoja.py (hojas de contactos) y qa_sleep.py
+# Externos (no pip): Node 20+ (npm ci), ffmpeg en el PATH (qa_sleep.py usa ebur128; el resto usa el ffmpeg de @remotion/compositor), Chrome lo descarga Remotion.
+# Opcional, solo para /realista (shorts Blender): Blender con su bpy propio.

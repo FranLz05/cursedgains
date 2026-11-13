@@ -1,0 +1,101 @@
+"""Musica + efectos (numpy/scipy) para el Video 6 DOMS (DomsShort). Voz: public/voz_doms/voz.wav; cortes: src/videos/doms/timeline.json.
+Cada corte duro lleva whoosh + golpe; efectos sincronizados a los eventos de las escenas. Salida: public/voz_doms/mezcla.wav (-14 LUFS).
+Uso: python volumen-basura/audio/generar_audio_doms.py"""
+import os, json, math, wave, subprocess
+import numpy as np
+from scipy import signal
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+SR = 44100
+TL = json.load(open(os.path.join(ROOT, "src", "videos", "doms", "timeline.json")))
+S = TL["starts"]; DUR = TL["duration"] + 0.25; N = int(DUR * SR)
+rng = np.random.default_rng(11)
+tt = lambda d: np.arange(int(d * SR)) / SR
+def lp(x, f): return signal.sosfilt(signal.butter(2, f, "low", fs=SR, output="sos"), x)
+def hp(x, f): return signal.sosfilt(signal.butter(2, f, "high", fs=SR, output="sos"), x)
+def bp(x, a, b): return signal.sosfilt(signal.butter(2, [a, b], "band", fs=SR, output="sos"), x)
+def noise(d): return rng.standard_normal(int(d * SR))
+def fade(x, a=0.004, b=0.004):
+    x = x.copy(); i, o = min(len(x), int(a * SR)), min(len(x), int(b * SR))
+    if i: x[:i] *= np.linspace(0, 1, i)
+    if o: x[-o:] *= np.linspace(1, 0, o)
+    return x
+def sweep(f0, f1, d, c=1.0):
+    t = tt(d); f = f0 + (f1 - f0) * (t / d) ** c; return np.sin(2 * np.pi * np.cumsum(f) / SR)
+def put(buf, x, t, g=1.0):
+    i = int(t * SR)
+    if i >= N or i + len(x) <= 0: return
+    a, b = max(0, i), min(N, i + len(x)); buf[:, a:b] += (x[a - i:b - i] * g)[None, :]
+music = np.zeros((2, N)); sfx = np.zeros((2, N))
+def kick(): return fade(sweep(190, 48, 0.3, 0.35) * np.exp(-tt(0.3) * 11), 0.0005, 0.01)
+def clap(): return fade(bp(noise(0.2), 1100, 4800) * np.exp(-tt(0.2) * 22) * 0.9, 0.0005, 0.02)
+def hat(): return fade(hp(noise(0.05), 7500) * np.exp(-tt(0.05) * 70) * 0.5, 0.0003, 0.01)
+def bass(f, d): x = (2 * ((tt(d) * f) % 1) - 1) * 0.6 + np.sin(2 * np.pi * f * tt(d)); return fade(lp(x, 600) * np.exp(-tt(d) * 2.5), 0.002, 0.03)
+def pluck(f, d=0.4): t = tt(d); return fade(sum(a * np.sin(2 * np.pi * f * m * t) * np.exp(-t * k) for m, a, k in [(1, 1, 7), (2.76, .4, 14)]), 0.001, 0.05)
+def whoosh(t, d=0.3, g=0.5):
+    n = noise(d); o = np.zeros_like(n)
+    for s in range(0, len(n) - 1024, 1024): f = 400 + 3800 * (s / len(n)) ** 1.3; o[s:s + 1024] = bp(n[s:s + 1024], f * .6, min(f * 1.5, 20000))[:1024]
+    put(sfx, fade(o * np.sin(np.pi * np.linspace(0, 1, len(o))) ** 1.5, .01, .05), t - d * 0.8, g)
+def thud(t, g=0.7, f=100): put(sfx, fade(lp(sweep(f * 1.4, f * .6, .16, .6), 400) * np.exp(-tt(.16) * 18), .001, .03), t, g)
+def boom(t, g=1.0): put(sfx, fade(lp(sweep(90, 30, .9, .5), 300) * np.exp(-tt(.9) * 4), .001, .2), t, g); put(sfx, fade(lp(noise(.5), 900) * np.exp(-tt(.5) * 7), .001, .1), t, g * .6)
+def beep(t, f=2093, g=.3, d=.08): put(sfx, fade(np.sin(2 * np.pi * f * tt(d)) * np.exp(-tt(d) * 6), .002, .02), t, g)
+def slide(t, f0, f1, d, g=.35): put(sfx, fade(sweep(f0, f1, d) * (1 + .15 * np.sin(2 * np.pi * 6 * tt(d))), .02, .05), t, g)
+def bang(t, g=1.0): put(sfx, fade(bp(noise(.25), 300, 2500) * np.exp(-tt(.25) * 18), .0005, .03), t, g); thud(t, g * .8, 160)
+def spray(t, d, g=.25): put(sfx, fade(hp(noise(d), 3000) * 0.5, .05, .1), t, g)
+
+BEAT = 60 / 128
+def groove(t0, t1, hats=True, claps=True):
+    t = t0
+    while t < t1:
+        b = int(round((t - t0) / BEAT)) % 4
+        put(music, kick(), t, .9)
+        if claps and b in (1, 3): put(music, clap(), t, .4)
+        if hats: put(music, hat(), t + BEAT / 2, .3)
+        put(music, bass(55 * (1.5 if b == 3 else 1), BEAT * .45), t, .8)
+        if b % 2 == 0: put(music, pluck(440 * (1.5 if (b // 2) % 2 else 1), .4), t + BEAT / 2, .3)
+        t += BEAT
+groove(S[1], S[6]); groove(S[8], S[9]); groove(S[12], S[15] - 0.1); groove(S[15], DUR - .5, claps=True)
+put(music, lp(sweep(120, 1200, 1.2, 2.5) * np.linspace(0, 1, int(1.2 * SR)) ** 2, 3000), S[15] - 1.2, .3)
+for tc in S[1:]: whoosh(tc + .04, .3, .5); thud(tc, .6, 90)
+# scene events (seconds from the scene start, as in the TS scenes)
+for k in range(8): beep(.05 + k * .12)                                         # 1: smoking log legs: crackle
+for k in range(10): put(sfx, fade(bp(noise(.04), 1500, 4000), .001, .01), S[0] + .1 + rng.uniform(0, 2.6), .25)
+slide(S[1] + .4, 900, 200, .7, .3); boom(S[1] + 1.15, .5)                      # 2: tumble + landing
+for k in range(3): put(sfx, fade(sweep(500 + 150 * k, 1200, .15) * np.exp(-tt(.15) * 12), .002, .02), S[2] + 1.3 + k * .45, .3)   # 3: dream chimes + nukes
+boom(S[2] + 1.15, .8); boom(S[2] + 1.6, .8)
+for k in range(14): put(sfx, fade(bp(noise(.05), 600, 1800) * np.exp(-tt(.05) * 40), .001, .01), S[3] + .2 + k * .2, .25)  # 4: wheel creak
+for k in (.55, 1.75, 2.95): bang(S[4] + k, 1.1)                                # 5: gavel
+put(sfx, fade(hp(noise(.25), 1500) * np.exp(-tt(.25) * 10), .001, .03), S[5] + .38, .6); thud(S[5] + .5, .7, 140)   # 6: paper slap
+slide(S[6] + .1, 150, 900, .7, .3)                                             # 7: zoom in
+for k in range(6): slide(S[6] + .9 + k * .3, 700, 1100, .15, .22)             # sirens
+for k in range(4): slide(S[7] + k * .8, 800, 1200, .4, .2)                     # 8: sirens + spray
+spray(S[7], 3.0, .3)
+for k in range(6): put(sfx, fade(sweep(900, 1500, .08) * np.exp(-tt(.08) * 20), .001, .02), S[8] + .2 + k * .4, .25)   # 9: toaster pops
+thud(S[8] + .5, .4, 200)
+slide(S[9] + .3, 1800, 150, .55, .5); bang(S[9] + .85, 1.2); boom(S[9] + .85, .6)  # 10: anvil
+slide(S[10] + .1, 200, 1500, 1.0, .4); boom(S[10] + 1.15, 1.1)                  # 11: soreness meter blows
+for k in range(8): put(sfx, fade(bp(noise(.06), 1200, 3500), .001, .01), S[10] + 1.2 + k * .06, .35)
+put(sfx, fade(lp(noise(2.8), 300) * .08, .2, .5), S[11])                       # 12: silence / cobwebs
+slide(S[11] + 1.5, 900, 130, 1.2, .2)
+for k, d in enumerate((.5, .9, 1.3, 1.7, 2.1)): thud(S[12] + d + .25, .5, 140 + 15 * k); put(sfx, fade(np.sin(2 * np.pi * (1500 + 300 * k) * tt(.5)) * np.exp(-tt(.5) * 6), .002, .1), S[12] + d + .25, .25)  # 13: plates
+for k in range(30): beep(S[13] + k * .1, 2093 if k % 2 else 1760, .22, .07)    # 14: alarms
+slide(S[14] + .4, 900, 90, 2.0, .35)                                           # 15: battery drain
+for k in range(3): put(sfx, fade(lp(sweep(500, 90, .5), 600) * np.exp(-tt(.5) * 5), .01, .1), S[14] + 1.0 + k * .6, .25)
+for k in range(5): beep(S[15] + .3 + k * .9, 1000, .2, .12)                   # 16: monitor beeps
+put(sfx, fade(sweep(200, 900, 1.0) * np.linspace(0, 1, SR), .1, .1), S[15] + 4.5, .12)
+w = wave.open(os.path.join(ROOT, "public", "voz_doms", "voz.wav")); vs = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float64) / 32768
+voice = np.zeros((2, N)); voice[0, :min(N, len(vs))] = vs[:N]; voice[1] = voice[0]
+act = np.abs(voice[0]); env = np.zeros(N); e = 0.0; r = math.exp(-64 / (0.25 * SR))
+for i in range(0, N, 64): m = act[i:i + 64].max(); e = m if m > e else e * r; env[i:i + 64] = e
+duck = 1 - .55 * np.clip(env / (np.percentile(env, 95) + 1e-9), 0, 1)
+rms = lambda x: math.sqrt(float(np.mean(x[x != 0] ** 2))) if np.any(x != 0) else 1e-9
+rv = rms(voice[0][np.abs(voice[0]) > .01])
+mus = music * duck; mus *= rv * 10 ** (-8 / 20) / rms(mus[0][np.abs(mus[0]) > 1e-4])
+sf = sfx.copy(); sf *= rv * 10 ** (-8.5 / 20) / rms(sf[0][np.abs(sf[0]) > 1e-3])
+mix = voice + mus + sf; mix = mix / max(1.0, np.max(np.abs(mix)) / .89)
+raw = os.path.join(ROOT, "out", "mezcla_doms_raw.wav")
+with wave.open(raw, "wb") as o: o.setnchannels(2); o.setsampwidth(2); o.setframerate(SR); o.writeframes((np.clip(mix, -1, 1).T * 32767).astype("<i2").tobytes())
+FF = os.path.join(ROOT, "node_modules", "@remotion", "compositor-win32-x64-msvc", "ffmpeg.exe")
+dst = os.path.join(ROOT, "public", "voz_doms", "mezcla.wav")
+subprocess.run([FF, "-y", "-v", "error", "-i", raw, "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "44100", dst], check=True)
+print("ok", dst)

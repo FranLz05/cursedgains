@@ -1,0 +1,66 @@
+
+# ---- events
+def roar(t0, t1, g=0.5):          # a blowtorch roar: filtered noise with flutter
+    d = t1 - t0; n = noise(d); x = bp(n, 180, 1800, 2) * (0.7 + 0.3 * np.sin(2 * np.pi * 9 * tt(d)))
+    x = x + hp(noise(d), 3000) * 0.12
+    put(sfx, fade(x, 0.05, 0.08) * g, t0)
+def servo(t, g=0.3, f0=420, f1=900, d=0.28): put(sfx, fade(lp(sweep(f0, f1, d, 1.0) + 0.4 * saw(f0, d), 2600) * np.sin(np.pi * np.linspace(0, 1, int(d * SR))), 0.005, 0.05) * g, t)
+def shout(t, d=0.42, g=0.5, f=210):      # megaphone yell: buzzy horn with a formant sweep
+    v = saw(f, d, (-4, 0, 4)) * np.sin(np.pi * np.linspace(0, 1, int(d * SR))) ** 0.6
+    put(sfx, fade(bp(v, 500, 2600) * 1.4 + hp(noise(d), 2500) * 0.12 * env_exp(d, 6), 0.01, 0.05) * g, t)
+def psh(t0, d, g=0.5): put(sfx, fade(hp(noise(d), 1800) * np.minimum(1, tt(d) * 40) * np.exp(-tt(d) * 1.2), 0.005, 0.15) * g, t0)
+# scene 1: ignition, roar the whole way, 5 crunches a second (grunt taps), servo whine on each cut, counter ticks, final womp-womp
+psh(2.0, 0.5, 0.6); roar(2.0, s[1] - 0.1, 0.55); thud(2.0, 0.9, 80)
+k = 0
+while k * 1.0 < 2.0:
+    tap(k * 1.0 + 0.4, 0.2, 300); k += 1
+k = 0
+while 2.0 + k * 0.2 < s[1] - 0.3:
+    tap(2.0 + k * 0.2 + 0.02, 0.28, 300 + 120 * (k % 3)); k += 1
+for c in CUTS[:6]:
+    whoosh(c + 0.05, 0.3, 0.55); servo(c - 0.1, 0.28, 380, 760)
+k = 0
+while 0.4 + k * 0.5 < 2.0:
+    beep(0.4 + k * 0.5, 0.1, 1500, 0.04); k += 1
+k = 0
+while 2.0 + k * 0.12 < 8.9:
+    beep(2.0 + k * 0.12, 0.12, 1800 + 8 * k, 0.04); k += 1
+for kk in range(2): beep(8.95 + kk * 0.18, 0.3, 2400, 0.12)
+for kk, f0 in enumerate((392, 370, 349, 330)): put(sfx, fade(lp(saw(f0, 0.5, (-3, 0, 3)), 1200) * env_exp(0.5, 3), 0.005, 0.1) * 0.6, tRight + 0.15 + kk * 0.42)
+thud(tRight + 0.1, 0.8, 60)
+# scene 2: zoom whoosh + electric hum, megaphone yells on the beat, muffled thumps (headphones), stamp, flatline, faint
+whoosh(s[1] + 0.9, 0.9, 0.8); put(sfx, fade(lp(saw(55, 12.2, (-5, 0, 5)), 400) * 0.18, 0.5, 0.5), s[1] + 0.9)
+for k in range(11): shout(s[1] + 1.4 + k * 0.9, 0.42, 0.5, 190 + 30 * (k % 3))
+for k in range(11): thud(s[1] + 1.4 + k * 0.9 + 0.5, 0.35, 150)
+for k in range(5): put(sfx, fade(bp(noise(0.25), 120, 700) * env_exp(0.25, 10), 0.004, 0.05) * 0.4, s[1] + 2.0 + k * 1.7)
+stamp(s[1] + 6.2, 0.9); ding(s[1] + 1.5, 0.25, 88); ding(s[1] + 10.2, 0.3, 80)
+put(sfx, fade(np.sin(2 * np.pi * 1000 * tt(1.2)) * 0.5, 0.01, 0.02) * 0.4, s[1] + 10.5)
+put(sfx, fade(hp(noise(0.5), 2000) * env_exp(0.5, 5), 0.004, 0.1) * 0.5, s[1] + 10.2)
+put(sfx, fade(sweep(900, 150, 1.3, 0.7) * env_exp(1.3, 1.4), 0.01, 0.2) * 0.5, s[1] + 12.3)
+# scene 3: bar power-up, 7 arrows whoosh at once, soft pulse, a tick per body part, final ding
+whoosh(s[2] + 0.1, 0.5, 0.6)
+put(sfx, sweep(260, 1800, 0.5, 1.6) * np.linspace(0, 0.5, int(0.5 * SR)) * 0.5, tDef - 0.35); ding(tDef + 0.15, 0.55, 91); ding(tDef + 0.3, 0.3, 98)
+for i in range(7): whoosh(tAll + i * 0.012 + 0.05, 0.35, 0.28)
+for w_ in ("face", "arms", "legs", "belly"): beep(word_t(w_) - 0.02, 0.28, 1320, 0.1)
+put(sfx, fade(lp(saw(80, e[2] - tAll, (-4, 0, 4)), 500) * 0.15, 0.3, 0.3), tAll)
+ding(tBelly + 0.4, 0.45, 96)
+# scene 4: water room: drain gurgle the whole scene, a plip on every scoop, a tiny cute ting on TINY BUCKET, a final suction
+whoosh(s[3] + 0.05, 0.5, 0.6)
+dg = lp(noise(e[3] - s[3]), 900) * (0.6 + 0.4 * np.sin(2 * np.pi * 3.2 * tt(e[3] - s[3]))); put(sfx, fade(dg, 0.2, 0.3) * 0.35, s[3] + 0.5)
+for k in range(10): plip(s[3] + 1.4 + k * 0.62, 0.45)
+for k in range(6): put(sfx, fade(bp(noise(0.25), 300, 1500) * env_exp(0.25, 9), 0.004, 0.05) * 0.5, s[3] + 1.5 + k * 0.97)
+for c in CUTS[6:10]: whoosh(c + 0.05, 0.3, 0.55)
+ding(tTiny + 0.05, 0.3, 100); ding(tTiny + 0.17, 0.2, 105)
+put(sfx, fade(sweep(900, 80, 1.1, 0.6) * env_exp(1.1, 1.2), 0.01, 0.2) * 0.5, e[3] - 1.2)
+# scene 5: flame roar, pigeon waddle + coo, extinguisher blast, fizz-out, sign fanfare
+roar(s[4], s[4] + T5_OUT + 0.4, 0.5)
+for c in CUTS[10:]: whoosh(c + 0.05, 0.3, 0.55)
+for k in range(8): tap(s[4] + T5_PIGEON + k * 0.16, 0.3, 700)
+for k, f0 in enumerate((520, 470, 540)): put(sfx, fade(sweep(f0, f0 * 0.72, 0.28, 0.8) * (1 + 0.2 * np.sin(2 * np.pi * 22 * tt(0.28))) * env_exp(0.28, 7), 0.01, 0.06) * 0.55, s[4] + T5_PIGEON + 0.3 + k * 0.34, pan=0.3)
+psh(s[4] + T5_SPRAY, 1.0, 0.9); thud(s[4] + T5_SPRAY, 0.7, 90)
+put(sfx, fade(hp(noise(0.9), 900) * env_exp(0.9, 3.0), 0.01, 0.3) * 0.7, s[4] + T5_OUT)
+put(sfx, fade(lp(sweep(500, 90, 0.8, 0.7), 900) * env_exp(0.8, 3), 0.01, 0.2) * 0.8, s[4] + T5_OUT + 0.1)
+ding(tSign + 0.05, 0.55, 96); stamp(tSign - 0.05, 0.7)
+for k in range(5): put(sfx, fade(bp(noise(0.08), 3000, 9000) * env_exp(0.08, 40), 0.001, 0.02) * 0.3, tSign + 0.2 + k * 0.4, pan=0.3)
+room = lp(noise(DUR), 500) * 0.03; sfx[0] += room; sfx[1] += room
+

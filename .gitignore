@@ -1,0 +1,19 @@
+# dependencias (se reinstalan con npm ci / pip install -r requirements.txt)
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# renders y temporales (1.3 GB, regenerables). Se conserva solo la auditoria de referencia Rick Clips que usa qa_sleep.py
+out/*
+!out/auditoria/
+!out/auditoria/**
+
+# logs / sistema / secretos
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+.remotion/

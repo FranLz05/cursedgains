@@ -1,0 +1,33 @@
+# ------------------------------------------------------------------ the score (by scene)
+WORDS = json.load(open(os.path.join(ROOT, "src", "videos", "soplete", "palabras.json"), encoding="utf-8"))["words"]
+def word_t(norm_, nth=0):
+    hits = [w for w in WORDS if "".join(ch for ch in w["w"].lower() if ch.isalpha()) == norm_]
+    return hits[nth]["t"]
+s = [ST[i] / FPS for i in range(5)]; e = [END[i] / FPS for i in range(5)]
+CUTS = [s[0] + x for x in (2.0, 3.0, 4.3, 5.6, 6.8, 8.2)] + [s[3] + x for x in (1.2, 3.3, 5.2, 6.4)] + [s[4] + x for x in (2.7, 5.2, 8.6)]
+T5_PIGEON, T5_SPRAY, T5_OUT, T5_SIGN = 4.7, 6.35, 7.05, 8.9
+tRight = word_t("right"); tImp = word_t("impossible"); tDef = word_t("deficit", 0); tAll = word_t("all"); tBelly = word_t("belly"); tTiny = word_t("tiny")
+# 1 the frenzy: full-energy groove from the first frame, a riser under the last seconds
+drums(0.0, 2.0, clap_on=False, half=True); bassline(0.0, 2.0, 0.6, 600)
+drums(2.0, s[1] - 0.15, clap_on=True); bassline(2.0, s[1] - 0.15, 0.95, 700); arp(2.0, s[1] - 0.15, 0.32, 3200)
+riser(s[1] - 2.2, s[1] - 0.05, 0.4)
+# 2 X-ray: tense half-time pulse with a muffled bass, a boom on IMPOSSIBLE, a sad slide when the muscle faints
+drums(s[1] + 0.9, e[1] - 0.05, clap_on=False, half=True); bassline(s[1] + 0.9, e[1] - 0.05, 0.6, 500); plucks(s[1] + 4.0, e[1] - 0.05, 0.35)
+put(music, kick(34, 1.0, 1.6), tImp, 1.2)
+put(music, fade(lp(sweep(520, 90, 1.4, 0.8), 1800) * env_exp(1.4, 1.6) * 0.8, 0.01, 0.2), s[1] + 12.2)
+# 3 the science: calm curious pulse, power-up on CALORIE DEFICIT, hopeful pluck run while the arrows flow
+drums(s[2], e[2] - 0.2, clap_on=False, half=True); bassline(s[2], e[2] - 0.2, 0.55, 600); plucks(tDef, e[2] - 0.2, 0.45); arp(tAll, e[2] - 0.2, 0.26, 3400)
+put(music, sweep(200, 1400, 0.6, 2.0) * np.linspace(0, 0.5, int(0.6 * SR)), tDef - 0.5); put(music, bell(midi(88), 1.6, 0.4), tDef)
+riser(e[2] - 2.5, e[2] - 0.05, 0.3)
+# 4 the pool: bouncy comic groove
+drums(s[3], e[3] - 0.2, clap_on=False, half=True); bassline(s[3], e[3] - 0.2, 0.75, 650); plucks(s[3], e[3] - 0.2, 0.5); arp(s[3] + 2 * BAR, e[3] - 0.2, 0.25, 3200)
+# 5 the finale: groove, fanfare when the sign lands, a hopeful final chord
+drums(s[4], s[4] + T5_SIGN - 0.1, clap_on=False, half=True); bassline(s[4], s[4] + T5_SIGN - 0.1, 0.65, 600); plucks(s[4] + 0.5, s[4] + T5_SIGN - 0.1, 0.45)
+tSign = s[4] + T5_SIGN
+for n_ in (57, 60, 64, 69): put(music, stab(midi(n_), 1.6, 4200, 0.5), tSign)
+put(music, bell(midi(81), 2.2, 0.45), tSign + 0.05); put(music, kick(40, 0.6, 1.4), tSign, 1.1)
+# outro: the groove keeps going under the held sign, then one last hit right at the end (no dead tail)
+drums(tSign + 0.3, e[4] - 0.75, clap_on=True); bassline(tSign + 0.3, e[4] - 0.75, 0.7, 650); arp(tSign + 0.3, e[4] - 0.75, 0.26, 3200)
+for n_ in (57, 60, 64, 69, 76): put(music, stab(midi(n_), 0.9, 4200, 0.5), e[4] - 0.75)
+put(music, kick(40, 0.5, 1.4), e[4] - 0.75, 1.1); put(music, bell(midi(88), 1.0, 0.4), e[4] - 0.72)
+

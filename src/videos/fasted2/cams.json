@@ -1,0 +1,566 @@
+{
+ "_doc": "FastedCardioDynamic: 14 micro-scene shots. f0 = first frame (every f0 is a HARD CUT to a new set or a radically new angle). Inside a shot the camera never stops: story.ts joins the keys (t = seconds into the shot) with a Catmull-Rom spline and warps time with Easing.inOut(cubic) over a window padded 30 % before/after the shot, so it is moving on 100 % of the frames, enters soft and leaves soft. Read by story.ts and by volumen-basura/audio/generar_audio_fasted_dyn.py (one whoosh + hit per cut).",
+ "total": 1485,
+ "shots": [
+  {
+   "n": "bedroom: the 04:59 alarm clock, whip pan to zombie Tito rising from bed",
+   "f0": 0,
+   "set": "bed",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.36,
+      0.92,
+      1.95
+     ],
+     "look": [
+      0.12,
+      0.74,
+      0
+     ],
+     "fov": 38
+    },
+    {
+     "t": 1.85,
+     "pos": [
+      0.24,
+      0.86,
+      1.6
+     ],
+     "look": [
+      0.12,
+      0.74,
+      0
+     ],
+     "fov": 38
+    },
+    {
+     "t": 3.25,
+     "pos": [
+      -0.25,
+      1.4,
+      3.1
+     ],
+     "look": [
+      -1.5,
+      1.0,
+      -0.25
+     ],
+     "fov": 42
+    },
+    {
+     "t": 3.73,
+     "pos": [
+      -0.5,
+      1.32,
+      2.75
+     ],
+     "look": [
+      -1.55,
+      1.05,
+      -0.25
+     ],
+     "fov": 42
+    }
+   ]
+  },
+  {
+   "n": "POV from inside the empty fridge",
+   "f0": 112,
+   "set": "fridge",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      2.4,
+      1.22,
+      -1.52
+     ],
+     "look": [
+      2.4,
+      1.42,
+      0.7
+     ],
+     "fov": 66
+    },
+    {
+     "t": 1.33,
+     "pos": [
+      2.4,
+      1.26,
+      -1.3
+     ],
+     "look": [
+      2.4,
+      1.5,
+      0.7
+     ],
+     "fov": 64
+    }
+   ]
+  },
+  {
+   "n": "gym: lateral travelling, Tito sprints, the bear rises behind the treadmill",
+   "f0": 152,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      -2.6,
+      1.35,
+      4.8
+     ],
+     "look": [
+      -0.25,
+      1.35,
+      -0.3
+     ],
+     "fov": 42
+    },
+    {
+     "t": 3.33,
+     "pos": [
+      1.35,
+      1.6,
+      5.0
+     ],
+     "look": [
+      0.15,
+      1.7,
+      -0.6
+     ],
+     "fov": 42
+    }
+   ]
+  },
+  {
+   "n": "Why? extreme close-up of Tito's sweaty face",
+   "f0": 252,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.06,
+      1.86,
+      1.8
+     ],
+     "look": [
+      0,
+      1.8,
+      0
+     ],
+     "fov": 40
+    },
+    {
+     "t": 1.27,
+     "pos": [
+      0.0,
+      1.86,
+      1.48
+     ],
+     "look": [
+      0,
+      1.82,
+      0
+     ],
+     "fov": 40
+    }
+   ]
+  },
+  {
+   "n": "Tito's imagination: butter belly + two blowtorches, the MYTH stamp",
+   "f0": 290,
+   "set": "dream",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0,
+      1.95,
+      7.2
+     ],
+     "look": [
+      0,
+      1.45,
+      0
+     ],
+     "fov": 40
+    },
+    {
+     "t": 4.6,
+     "pos": [
+      0,
+      1.66,
+      4.7
+     ],
+     "look": [
+      0,
+      1.42,
+      0
+     ],
+     "fov": 40
+    },
+    {
+     "t": 6.53,
+     "pos": [
+      0,
+      1.6,
+      4.25
+     ],
+     "look": [
+      0,
+      1.38,
+      0
+     ],
+     "fov": 40
+    }
+   ]
+  },
+  {
+   "n": "high-angle orbit: the FAT and CARBS tanks bubbling",
+   "f0": 486,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      2.5,
+      4.3,
+      5.3
+     ],
+     "look": [
+      0,
+      1.0,
+      -0.45
+     ],
+     "fov": 48
+    },
+    {
+     "t": 4.93,
+     "pos": [
+      -2.4,
+      4.0,
+      5.4
+     ],
+     "look": [
+      0,
+      1.05,
+      -0.45
+     ],
+     "fov": 48
+    }
+   ]
+  },
+  {
+   "n": "close-up: the insulin gauge on Tito's chest, thumbs up",
+   "f0": 634,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.28,
+      1.55,
+      3.0
+     ],
+     "look": [
+      0,
+      1.3,
+      0
+     ],
+     "fov": 40
+    },
+    {
+     "t": 5.07,
+     "pos": [
+      0.05,
+      1.5,
+      2.3
+     ],
+     "look": [
+      0,
+      1.4,
+      0
+     ],
+     "fov": 40
+    }
+   ]
+  },
+  {
+   "n": "the brain control centre: COMPENSATION MODE lever",
+   "f0": 786,
+   "set": "brain",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.7,
+      1.75,
+      4.4
+     ],
+     "look": [
+      0.12,
+      1.32,
+      0
+     ],
+     "fov": 42
+    },
+    {
+     "t": 2.67,
+     "pos": [
+      0.38,
+      1.62,
+      3.35
+     ],
+     "look": [
+      0.12,
+      1.32,
+      0
+     ],
+     "fov": 42
+    }
+   ]
+  },
+  {
+   "n": "living room 03:00 PM: Tito on the sofa, travelling to the giant balance",
+   "f0": 866,
+   "set": "home",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      -1.25,
+      1.35,
+      2.9
+     ],
+     "look": [
+      -1.45,
+      1.0,
+      -1.8
+     ],
+     "fov": 42
+    },
+    {
+     "t": 1.15,
+     "pos": [
+      -1.15,
+      1.35,
+      2.6
+     ],
+     "look": [
+      -1.45,
+      1.0,
+      -1.8
+     ],
+     "fov": 42
+    },
+    {
+     "t": 2.35,
+     "pos": [
+      1.45,
+      1.8,
+      4.2
+     ],
+     "look": [
+      1.5,
+      1.55,
+      -1.2
+     ],
+     "fov": 42
+    },
+    {
+     "t": 6.27,
+     "pos": [
+      1.45,
+      1.75,
+      3.75
+     ],
+     "look": [
+      1.5,
+      1.55,
+      -1.2
+     ],
+     "fov": 42
+    }
+   ]
+  },
+  {
+   "n": "the race: fasted vs fed Tito, finish tape, both jump onto the scales",
+   "f0": 1054,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0,
+      1.2,
+      7.6
+     ],
+     "look": [
+      0,
+      1.1,
+      0.5
+     ],
+     "fov": 50
+    },
+    {
+     "t": 4.2,
+     "pos": [
+      0,
+      1.08,
+      6.5
+     ],
+     "look": [
+      0,
+      1.0,
+      0.8
+     ],
+     "fov": 50
+    }
+   ]
+  },
+  {
+   "n": "low angle on the two identical scales, tilt up to the faces",
+   "f0": 1180,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0,
+      0.55,
+      7.0
+     ],
+     "look": [
+      0,
+      0.78,
+      1.75
+     ],
+     "fov": 50
+    },
+    {
+     "t": 2.87,
+     "pos": [
+      0,
+      0.85,
+      6.6
+     ],
+     "look": [
+      0,
+      1.3,
+      1.65
+     ],
+     "fov": 50
+    }
+   ]
+  },
+  {
+   "n": "top-down: Tito launched off the treadmill, splat on the floor",
+   "f0": 1266,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.1,
+      7.4,
+      2.3
+     ],
+     "look": [
+      0,
+      0,
+      0.55
+     ],
+     "fov": 46
+    },
+    {
+     "t": 2.57,
+     "pos": [
+      0.0,
+      6.1,
+      1.95
+     ],
+     "look": [
+      0,
+      0,
+      0.6
+     ],
+     "fov": 46
+    }
+   ]
+  },
+  {
+   "n": "Dr. Pigeon throws the banana, Tito recharges to 100%",
+   "f0": 1343,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.4,
+      1.4,
+      6.9
+     ],
+     "look": [
+      0.35,
+      1.1,
+      0
+     ],
+     "fov": 44
+    },
+    {
+     "t": 1.93,
+     "pos": [
+      0.35,
+      1.38,
+      6.4
+     ],
+     "look": [
+      0.35,
+      1.12,
+      0
+     ],
+     "fov": 44
+    }
+   ]
+  },
+  {
+   "n": "final: Dr. Pigeon up front with the sign, Tito with his banana",
+   "f0": 1401,
+   "set": "gym",
+   "keys": [
+    {
+     "t": 0.0,
+     "pos": [
+      0.15,
+      1.35,
+      7.9
+     ],
+     "look": [
+      0.15,
+      1.15,
+      0.3
+     ],
+     "fov": 44
+    },
+    {
+     "t": 2.8,
+     "pos": [
+      0.15,
+      1.3,
+      7.3
+     ],
+     "look": [
+      0.15,
+      1.13,
+      0.3
+     ],
+     "fov": 44
+    }
+   ]
+  }
+ ]
+}
